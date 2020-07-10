@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{default::Default, path::Path};
+use std::{default::Default, fs::OpenOptions, path::Path};
 
 pub trait Model: Serialize + Deserialize<'static> + Clone + Default {}
 
@@ -28,6 +28,13 @@ impl<T: Model> Configuer<T> {
     }
 
     pub fn save(&mut self) -> &Self {
+        let writer = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(self.file_name())
+            .unwrap();
+
+        bincode::serialize_into(writer, &self.data).unwrap();
         self
     }
 
