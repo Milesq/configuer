@@ -44,14 +44,16 @@ impl<T: Model> Configuer<T> {
         self
     }
 
+    #[cfg(feature = "dirs")]
     fn file_name(&self) -> String {
-        if cfg!(feature = "dirs") {
-            let mut file_path = dirs::home_dir().unwrap();
-            file_path.push(self.file_name.clone());
+        let mut file_path = dirs::home_dir().unwrap();
+        file_path.push(self.file_name.clone());
 
-            file_path.to_str().unwrap().to_string()
-        } else {
-            self.file_name.clone()
-        }
+        file_path.to_str().unwrap().to_string()
+    }
+
+    #[cfg(not(feature = "dirs"))]
+    fn file_name(&self) -> String {
+        self.file_name.clone()
     }
 }
