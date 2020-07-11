@@ -33,6 +33,7 @@ impl<T: for<'de> Model<'de>> Configuer<T> {
         if !Path::new(&Self::file_path(self.file_name.clone())).exists() {
             self.data = cb();
         }
+        self.save();
 
         self
     }
