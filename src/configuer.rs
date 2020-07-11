@@ -10,21 +10,27 @@ pub trait Model<'de>: Serialize + Deserialize<'de> + Clone + Default {}
 impl<'de, T: Serialize + Deserialize<'de> + Clone + Default> Model<'de> for T {}
 
 #[derive(Clone)]
-pub struct Configuer<'de, T: Model<'de>> {
-    pub(crate) file_name: String,
+pub struct Configuer<T: for<'de> Model<'de>> {
+    file_name: String,
     pub data: T,
 }
 
-impl<'de, T: Model<'de>> Configuer<'de, T> {
+impl<T: for<'de> Model<'de>> Configuer<T> {
     pub fn with_file(file_name: &str) -> Self {
+        let data = if let Ok(r) = File::open(Self::file_path(file_name.to_string())) {
+            bincode::deserialize_from::<_, T>(r).expect("Config file is damaged")
+        } else {
+            Default::default()
+        };
+
         Self {
             file_name: String::from(file_name),
-            data: Default::default(),
+            data,
         }
     }
 
     pub fn on_create(mut self, cb: impl FnOnce() -> T) -> Self {
-        if !Path::new(&self.file_name()).exists() {
+        if !Path::new(&Self::file_path(self.file_name.clone())).exists() {
             self.data = cb();
         }
 
@@ -35,31 +41,23 @@ impl<'de, T: Model<'de>> Configuer<'de, T> {
         let writer = OpenOptions::new()
             .write(true)
             .create(true)
-            .open(self.file_name())
+            .open(Self::file_path(self.file_name.clone()))
             .unwrap();
 
         bincode::serialize_into(writer, &self.data).unwrap();
         self
     }
 
-    pub fn load(self) -> Self {
-        let reader = File::open(self.file_name()).map(|r| {
-            bincode::deserialize_from::<_, T>(r).expect("Config file is damaged");
-        });
-
-        self
-    }
-
     #[cfg(feature = "dirs")]
-    fn file_name(&self) -> String {
+    fn file_path(file_name: String) -> String {
         let mut file_path = dirs::home_dir().unwrap();
-        file_path.push(self.file_name.clone());
+        file_path.push(file_name.clone());
 
         file_path.to_str().unwrap().to_string()
     }
 
     #[cfg(not(feature = "dirs"))]
-    fn file_name(&self) -> String {
-        self.file_name.clone()
+    fn file_path(file_name: String) -> String {
+        file_name.clone()
     }
 }

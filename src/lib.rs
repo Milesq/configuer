@@ -28,7 +28,7 @@ mod tests {
             config.save();
         }
 
-        let config = Configuer::<DataModel>::with_file("my").load();
+        let config = Configuer::<DataModel>::with_file("my");
 
         assert_eq!(config.data.points, 3);
     }
