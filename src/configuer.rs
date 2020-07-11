@@ -1,17 +1,21 @@
 use serde::{Deserialize, Serialize};
-use std::{default::Default, fs::OpenOptions, path::Path};
+use std::{
+    default::Default,
+    fs::{File, OpenOptions},
+    path::Path,
+};
 
-pub trait Model: Serialize + Deserialize<'static> + Clone + Default {}
+pub trait Model<'de>: Serialize + Deserialize<'de> + Clone + Default {}
 
-impl<T: Serialize + Deserialize<'static> + Clone + Default> Model for T {}
+impl<'de, T: Serialize + Deserialize<'de> + Clone + Default> Model<'de> for T {}
 
 #[derive(Clone)]
-pub struct Configuer<T: Model> {
+pub struct Configuer<'de, T: Model<'de>> {
     pub(crate) file_name: String,
     pub data: T,
 }
 
-impl<T: Model> Configuer<T> {
+impl<'de, T: Model<'de>> Configuer<'de, T> {
     pub fn with_file(file_name: &str) -> Self {
         Self {
             file_name: String::from(file_name),
@@ -39,7 +43,9 @@ impl<T: Model> Configuer<T> {
     }
 
     pub fn load(self) -> Self {
-        if !Path::new(&self.file_name()).exists() {}
+        let reader = File::open(self.file_name()).map(|r| {
+            bincode::deserialize_from::<_, T>(r).expect("Config file is damaged");
+        });
 
         self
     }
