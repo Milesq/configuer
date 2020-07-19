@@ -1,6 +1,9 @@
 [package]
 name = "configuer"
 version = "0.1.0"
+license = "MIT"
+description = "Tiny lib to help you organize your configuration data"
+homepage = "https://github.com/Milesq/configuer"
 authors = ["Milesq <wmilosz88@gmail.com>"]
 edition = "2018"
 
