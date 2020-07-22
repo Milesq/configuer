@@ -1,6 +1,6 @@
-mod configuer;
+mod configuer_struct;
 
-pub use configuer::*;
+pub use configuer_struct::Configuer;
 
 #[cfg(test)]
 mod tests {
