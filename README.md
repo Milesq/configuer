@@ -12,7 +12,8 @@ Configuer is a tiny lib which will help you organize your configuration data
 use configuer::Configuer;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, Default)]
+// Model must implement Serialize, Deserialize, CLone and Default. Debug is unneeded
+#[derive(Serialize, Deserialize, Clone, Default, Debug)]
 struct MyData {
     user_name: String,
 }
