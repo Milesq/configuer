@@ -1,4 +1,5 @@
 # Configuer
+[![dependency status](https://deps.rs/repo/github/milesq/configuer/status.svg)](https://deps.rs/repo/github/milesq/configuer)
 
 (name inspired by `dialoguer` ;D)
 
