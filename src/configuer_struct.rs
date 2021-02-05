@@ -49,15 +49,15 @@ impl<T: for<'de> Model<'de>> Configuer<T> {
         self
     }
 
-    #[cfg(feature = "dirs")]
+    #[cfg(feature = "dirs-next")]
     fn file_path(file_name: String) -> String {
-        let mut file_path = dirs::home_dir().unwrap();
+        let mut file_path = dirs_next::home_dir().unwrap();
         file_path.push(file_name.clone());
 
         file_path.to_str().unwrap().to_string()
     }
 
-    #[cfg(not(feature = "dirs"))]
+    #[cfg(not(feature = "dirs-next"))]
     fn file_path(file_name: String) -> String {
         file_name.clone()
     }
